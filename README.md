@@ -31,7 +31,9 @@ This is a project I'm building to support **clinicians** in the **early detectio
 
 ---
 Note:
+
 I am still working to upload all relevant files when they are deemed fit for public use.
+
 Most data files will not be uploaded due to sensitive information, but can be downloaded online for project use.
   - Clinical Data: https://portal.gdc.cancer.gov/ -> Projects -> Search "TCGA-LAML" -> Download and extract TSV files
   - Histopathology Images for Training: https://www.cancerimagingarchive.net/collection/c-nmc-2019/
