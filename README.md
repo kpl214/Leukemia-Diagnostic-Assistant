@@ -8,7 +8,7 @@ This is a project I'm building to support **clinicians** in the **early detectio
 
 ## 🔍 What It Does
 
-- Upload a **blood smear image** to check for signs of leukemia  
+- Upload a **histopathology image** (microscopic tissue sample) to check for signs of leukemia  
 - Enter **basic patient info** (age, gender, diagnosis)  
 - Get a **risk summary** based on similar patients in the **TCGA-LAML** dataset  
 - Ask questions through a **chatbot powered by LLaMA 3.1** with **function-calling** to interpret and explain model outputs  
