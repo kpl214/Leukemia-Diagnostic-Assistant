@@ -2,6 +2,10 @@
 
 This is a project I'm building to support **clinicians** in the **early detection** and **treatment guidance** for leukemia patients.
 
+
+![Project Prototype Image](https://github.com/user-attachments/assets/6264eaa1-524a-4191-a29c-f4b700d61d7e)
+
+
 ## 🔍 What It Does
 
 - Upload a **blood smear image** to check for signs of leukemia  
@@ -27,6 +31,7 @@ This is a project I'm building to support **clinicians** in the **early detectio
 
 ---
 Note:
+I am still working to upload all relevant files when they are deemed fit for public use.
 Most data files will not be uploaded due to sensitive information, but can be downloaded online for project use.
   - Clinical Data: https://portal.gdc.cancer.gov/ -> Projects -> Search "TCGA-LAML" -> Download and extract TSV files
   - Histopathology Images for Training: https://www.cancerimagingarchive.net/collection/c-nmc-2019/
