@@ -7,15 +7,17 @@ from pydantic import BaseModel, Field, field_validator
 import torch
 from torchvision import transforms
 from PIL import Image
+import os
 
-#model = joblib.load("../clinical-data/simplified_svm_model.pkl")
-bundle = joblib.load("../clinical-data/hgb_calibrated_bundle.pkl")
+BASE_DIR = os.path.dirname(__file__)
+#model = joblib.load("clinical-data/simplified_svm_model.pkl")
+bundle = joblib.load(os.path.join(BASE_DIR, "clinical-data/hgb_calibrated_bundle.pkl"))
 preprocessor = bundle["preprocessor"]
 model = bundle["model"]
 print("Loaded model classes_:", model.classes_)
 
 cnn_model = torch.load(
-    "../image_training_data/tissue_cnn_model.pth",
+    os.path.join(BASE_DIR, "image_training_data/tissue_cnn_model.pth"),
     map_location=torch.device("cpu"),
     weights_only=False,
 )
