@@ -29,6 +29,30 @@ This is a project I'm building to support **clinicians** in the **early detectio
 - Pandas (for clinical data processing)  
 - LangChain + LLaMA 3.1 (chatbot and tool interface)  
 
+## 🐳 Docker Deployment
+
+This project includes all the files you need to build the app from source using Docker — however, if your goal is to get the app running quickly without waiting for builds or downloading packages, we’ve also included a prebuilt Docker image as a .tar file.
+
+Use the prebuilt image: leukemia-app.tar
+
+1. Clone the repository
+   `git clone https://github.com/kpl214/leukemia-diagnostic-assistant.git`
+   `cd leukemia-diagnostic-assistant`
+
+2. Load the prebuilt Docker image
+   `docker load -i leukemia-app.tar`
+
+3. Run the container
+   `docker run -d -p 80:80 leukemia-diagnostic-assistant-nginx:latest`
+
+4. Visit the app
+   `http://localhost`
+
+This is the **fastest and easiest way** to try the app - no setup or build steps required.
+
+If you wish to build the image yourself for development purposes (may take longer to use app), utilize:
+`docker compose up --build` and visit `http://localhost:5173`
+
 ---
 Note:
 
