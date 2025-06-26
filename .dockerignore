@@ -1,0 +1,22 @@
+backend/clinical-data/cleaned_leukemia_dataset.csv
+backend/image_training_data/C-NMC_training_data/
+backend/image_training_data/C-NMC_test_final_phase_data/
+backend/image_training_data/C-NMC_test_prelim_phase_data/
+backend/model-training/
+
+frontend/node_modules/
+frontend/dist/
+
+train_*.py
+
+*.tsv
+*.log
+*.ipynb_checkpoints
+__pycache__/
+*.pyc
+*.pyo
+
+
+# hgb_calibrated_bundle.pkl
+# tissue_cnn_model.pth
+# These are required for runtime inference
