@@ -8,26 +8,54 @@ This is a project I'm building to support **clinicians** in the **early detectio
 
 ## 🔍 What It Does
 
-- Upload a **histopathology image** (microscopic tissue sample) to check for signs of leukemia  
-- Enter **basic patient info** (age, gender, diagnosis)  
-- Get a **risk summary** based on similar patients in the **TCGA-LAML** dataset  
-- Ask questions through a **chatbot powered by LLaMA 3.1** with **function-calling** to interpret and explain model outputs  
+- **Upload a histopathology image** (a blood-smear cell image) and get it classified as **normal** or **leukemic**, with a confidence score and a **Grad-CAM heatmap** showing which part of the image actually drove the call.
+- **Describe a patient in plain language** — age, diagnosis, and optionally gender/race — and get a calibrated **recurrence/mortality risk estimate**. The assistant explains *why*: it names the specific factors that drove that patient's result, and tells you if it had to assume a missing detail instead of quietly guessing.
+- **Switch between two chat models**: a general-purpose model with full tool access (it can actually run the risk calculator and image classifier), and a medical-domain model for plain conversational Q&A that has no tool access on this endpoint and will tell you to switch back if you ask it for a specific number.
+- **Multiple conversations**, managed from a sidebar — start a new chat, rename or delete one, switch between them. Everything persists in the browser across a page refresh.
+- Assistant responses render **Markdown and syntax-highlighted code**, not plain text.
 
 ## ⚙️ Under the Hood
 
-- ML model trained on the **C-NMC 2019 dataset** for image classification  
-- Cleaned and transformed data from **TCGA-LAML** for patient matching and outcome estimation  
-- Clinical risk prediction using both **SVM** and **Histogram Gradient Boosting (HGB)** to reduce bias and improve interpretability  
-- Chatbot powered by **LLaMA 3.1** and **LangChain**, using structured **function-calling** to trigger predictions and generate explanations  
+### The calibrated clinical risk model
+
+Trained on clinical/demographic/outcome data from the NIH's **TCGA-LAML** cohort (Genomic Data Commons). A patient is labeled high-risk if a follow-up visit recorded disease progression/recurrence, or they died within two years of diagnosis.
+
+It predicts from four features — **age at diagnosis, gender, race, and primary diagnosis subtype** — deliberately limited to things a clinician actually knows at diagnosis, before any outcome is known.
+
+- **Base classifier**: a `HistGradientBoostingClassifier` — a histogram-based gradient-boosted ensemble of decision trees. Trees are built one at a time, each one trained to correct the errors of every tree built before it, with each tree's contribution scaled down (`learning_rate`) so no single tree dominates.
+- **Calibration**: the base classifier is wrapped in a `CalibratedClassifierCV` using isotonic regression over 5-fold cross-validation. Raw gradient-boosting scores aren't reliable probabilities on their own — calibration maps them so that a predicted "70% risk" corresponds to roughly 70% real-world frequency among similar patients, not just a ranking score.
+- **Explainability**: every prediction also runs through SHAP (SHapley Additive exPlanations), computing a fresh, per-patient breakdown of which features pushed that specific result toward higher or lower risk — not a single static importance ranking.
+- Currently scores an AUROC of ~0.76 on held-out data.
+
+### The CNN image classifier
+
+A **ResNet18** (pretrained on ImageNet) fine-tuned via transfer learning on the **C-NMC 2019** dataset — single blood-smear cell images labeled normal (`hem`) or leukemic (`all`) by the ISBI 2019 challenge organizers. It outputs a binary classification with a confidence score.
+
+Every classification also runs **Grad-CAM**: the predicted class is backpropagated through the network's last convolutional layer to produce a heatmap of which pixels actually influenced the decision, overlaid on the original image.
+
+### The chatbot layer
+
+Built with **LangChain**'s tool-calling agent pattern. The primary model (an OpenAI-compatible Llama endpoint) decides, from the conversation, whether a question needs a numeric prediction at all — and if so, which tool to call — then explains the result in plain, clinically-worded language with a disclaimer. The secondary model (a medical-domain model) runs as a plain conversational chain with no tool access, for general questions.
 
 ## 🛠️ Tech Stack
 
-- Python + Flask (backend API)  
-- Vue 3 + Vite (frontend UI)  
-- PyTorch (for the CNN image model)  
-- scikit-learn (for SVM and HGB clinical models)  
-- Pandas (for clinical data processing)  
-- LangChain + LLaMA 3.1 (chatbot and tool interface)  
+**Backend**
+- Python + Flask (API), Gunicorn (production WSGI server)
+- PyTorch + torchvision — CNN model, transfer learning, Grad-CAM
+- scikit-learn — `HistGradientBoostingClassifier` + `CalibratedClassifierCV`
+- SHAP — per-prediction feature explanations
+- pandas — clinical data cleaning and merging
+- LangChain + `langchain-openai` — the tool-calling agent and chat model integration
+
+**Frontend**
+- Vue 3 + Vite
+- `marked` + `highlight.js` — Markdown rendering and code syntax highlighting
+- DOMPurify — sanitizing model-generated HTML before it's rendered
+
+**Deployment**
+- Docker + Docker Compose (separate dev and production configs)
+- nginx — production reverse proxy, serves the built frontend
+- Gunicorn — production WSGI server for the Flask API
 
 ## 🐳 Docker Deployment
 
